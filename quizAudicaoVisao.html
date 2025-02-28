@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Visão e Audição</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            font-size: 20px;
+            margin: 30px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 2px solid #333;
+            border-radius: 10px;
+        }
+        button {
+            font-size: 18px;
+            margin: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Teste sua Visão e Audição</h2>
+        <p id="pergunta"></p>
+        <button onclick="responder('sim')">Sim</button>
+        <button onclick="responder('nao')">Não</button>
+        <p id="resultado" style="font-weight: bold; margin-top: 20px;"></p>
+    </div>
+
+    <script>
+        const perguntasVisao = [
+            "Você sente dificuldade em ler rótulos pequenos?",
+            "Você precisa de mais luz para ler do que antes?",
+            "As cores parecem menos vibrantes?",
+            "Você já percebeu halos ao redor das luzes?",
+            "Você tem dificuldade em enxergar à noite?"
+        ];
+        
+        const perguntasAudicao = [
+            "Você tem dificuldade em ouvir conversas em locais barulhentos?",
+            "Você pede para as pessoas repetirem o que disseram?",
+            "O volume da TV está mais alto do que antes?",
+            "Você tem zumbido nos ouvidos frequentemente?",
+            "Você já teve infecções ou dores no ouvido recentemente?"
+        ];
+
+        let indice = 0;
+        let scoreVisao = 0, scoreAudicao = 0;
+        let fase = "visao";
+        
+        function iniciarQuiz() {
+            document.getElementById("pergunta").innerText = perguntasVisao[indice];
+        }
+        
+        function responder(resposta) {
+            if (fase === "visao") {
+                if (resposta === "sim") scoreVisao++;
+                indice++;
+                if (indice < perguntasVisao.length) {
+                    document.getElementById("pergunta").innerText = perguntasVisao[indice];
+                } else {
+                    fase = "audicao";
+                    indice = 0;
+                    document.getElementById("pergunta").innerText = perguntasAudicao[indice];
+                }
+            } else {
+                if (resposta === "sim") scoreAudicao++;
+                indice++;
+                if (indice < perguntasAudicao.length) {
+                    document.getElementById("pergunta").innerText = perguntasAudicao[indice];
+                } else {
+                    mostrarResultado();
+                }
+            }
+        }
+
+        function mostrarResultado() {
+            let resultadoVisao = scoreVisao >= 3 ? "Recomendamos uma consulta oftalmológica." : "Sua visão parece boa!";
+            let resultadoAudicao = scoreAudicao >= 3 ? "Recomendamos um exame auditivo." : "Sua audição parece boa!";
+            document.getElementById("pergunta").innerText = "Quiz Finalizado!";
+            document.getElementById("resultado").innerText = `\nVisão: ${resultadoVisao}\nAudição: ${resultadoAudicao}`;
+        }
+        
+        iniciarQuiz();
+    </script>
+</body>
+</html>
