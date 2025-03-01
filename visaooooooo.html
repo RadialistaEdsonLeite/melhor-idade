@@ -1,0 +1,15 @@
+import React, { useState } from "react"; import { Button } from "@/components/ui/button"; const QuizVisao = () => { const perguntas = [ { pergunta: "Você sente dificuldade para ler letras pequenas?", opcoes: ["Nunca", "Às vezes", "Frequentemente", "Sempre"], }, { pergunta: "Você enxerga bem de longe sem óculos?", opcoes: ["Sim, perfeitamente", "Com leve dificuldade", "Com bastante dificuldade", "Não consigo ver nada"], }, { pergunta: "Você sente os olhos cansados ao final do dia?", opcoes: ["Nunca", "Às vezes", "Frequentemente", "Sempre"], }, { pergunta: "Luzes muito brilhantes te incomodam?", opcoes: ["Não", "Levemente", "Sim, bastante", "Muito mesmo"], }, { pergunta: "Você vê halos ao redor das luzes à noite?", opcoes: ["Nunca", "Às vezes", "Frequentemente", "Sempre"], }, { pergunta: "Sente visão embaçada ao mudar o foco de perto para longe?", opcoes: ["Nunca", "Às vezes", "Frequentemente", "Sempre"], }, { pergunta: "Precisa aumentar o brilho da tela para enxergar melhor?", opcoes: ["Não", "Sim, um pouco", "Sim, bastante", "Sempre"], }, { pergunta: "Enxerga cores de forma vívida e nítida?", opcoes: ["Sim, perfeitamente", "Com leve dificuldade", "Com bastante dificuldade", "Não vejo bem as cores"], }, { pergunta: "Tem dificuldade para dirigir à noite?", opcoes: ["Nenhuma", "Pouca", "Moderada", "Muita"], }, { pergunta: "Você pisca ou esfrega os olhos com frequência para tentar ver melhor?", opcoes: ["Nunca", "Às vezes", "Frequentemente", "Sempre"], }, ]; const [respostas, setRespostas] = useState(Array(perguntas.length).fill(null)); const [finalizado, setFinalizado] = useState(false); const handleResposta = (index, resposta) => { const novasRespostas = [...respostas]; novasRespostas[index] = resposta; setRespostas(novasRespostas); }; const calcularResultado = () => { const pontos = respostas.reduce((acc, resp) => { if (resp === "Nunca" || resp === "Sim, perfeitamente" || resp === "Nenhuma") return acc + 0; if (resp === "Às vezes" || resp === "Com leve dificuldade" || resp === "Pouca") return acc + 1; if (resp === "Frequentemente" || resp === "Com bastante dificuldade" || resp === "Moderada") return acc + 2; if (resp === "Sempre" || resp === "Não consigo ver nada" || resp === "Muita") return acc + 3; return acc; }, 0); if (pontos <= 5) return "Sua visão está ótima! Continue se cuidando."; if (pontos <= 15) return "Sua visão apresenta algumas dificuldades. Um check-up pode ser interessante."; return "Você pode estar com dificuldades significativas na visão. Recomendamos procurar um oftalmologista."; }; return (
+Teste Rápido de Visão
+{!finalizado ? (
+{perguntas.map((q, index) => (
+{q.pergunta}
+
+{q.opcoes.map((op, i) => ( handleResposta(index, op)} > {op} ))}
+))} setFinalizado(true)}>Ver Resultado
+) : (
+Resultado do Teste
+{calcularResultado()}
+
+window.close()}>Voltar ao eBook
+)}
+); }; export default QuizVisao;
