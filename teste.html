@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Conhecimento</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1e1e1e;
+            border-radius: 10px;
+        }
+        .pergunta {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .opcao {
+            display: block;
+            background: orange;
+            color: black;
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .opcao:hover {
+            background: darkorange;
+        }
+        #resultado {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz de Conhecimento</h1>
+        <div id="quiz"></div>
+        <button id="verResultado" style="display:none; background: orange; color: black; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">Ver Resultado</button>
+        <p id="resultado"></p>
+    </div>
+    
+    <script>
+        const perguntas = [
+            { pergunta: "Qual é a capital da França?", opcoes: ["Londres", "Paris", "Roma", "Berlim"], correta: 1 },
+            { pergunta: "Quanto é 7 x 8?", opcoes: ["54", "56", "48", "64"], correta: 1 },
+            { pergunta: "Quem escreveu 'Dom Quixote'?", opcoes: ["Shakespeare", "Machado de Assis", "Cervantes", "Tolstói"], correta: 2 },
+            { pergunta: "Qual planeta é conhecido como Planeta Vermelho?", opcoes: ["Terra", "Marte", "Júpiter", "Saturno"], correta: 1 },
+            { pergunta: "Quantos continentes existem?", opcoes: ["5", "6", "7", "8"], correta: 2 },
+            { pergunta: "Qual é o maior oceano do mundo?", opcoes: ["Atlântico", "Índico", "Pacífico", "Ártico"], correta: 2 },
+            { pergunta: "Quem pintou a Mona Lisa?", opcoes: ["Van Gogh", "Da Vinci", "Michelangelo", "Rembrandt"], correta: 1 },
+            { pergunta: "Qual o símbolo químico do ouro?", opcoes: ["Ag", "Au", "Pb", "Fe"], correta: 1 },
+            { pergunta: "Em que ano o homem pisou na Lua?", opcoes: ["1965", "1969", "1972", "1980"], correta: 1 },
+            { pergunta: "Qual é o maior mamífero do mundo?", opcoes: ["Elefante", "Baleia Azul", "Orca", "Hipopótamo"], correta: 1 }
+        ];
+        
+        const quizDiv = document.getElementById("quiz");
+        const verResultadoBtn = document.getElementById("verResultado");
+        const resultadoDiv = document.getElementById("resultado");
+        let respostas = [];
+        
+        function carregarQuiz() {
+            perguntas.forEach((q, index) => {
+                const perguntaDiv = document.createElement("div");
+                perguntaDiv.classList.add("pergunta");
+                perguntaDiv.innerHTML = `<p>${q.pergunta}</p>`;
+                
+                q.opcoes.forEach((op, i) => {
+                    const botao = document.createElement("button");
+                    botao.classList.add("opcao");
+                    botao.innerText = op;
+                    botao.onclick = () => selecionarResposta(index, i);
+                    perguntaDiv.appendChild(botao);
+                });
+                
+                quizDiv.appendChild(perguntaDiv);
+            });
+        }
+        
+        function selecionarResposta(perguntaIndex, respostaIndex) {
+            respostas[perguntaIndex] = respostaIndex;
+            
+            if (respostas.length === perguntas.length && !respostas.includes(undefined)) {
+                verResultadoBtn.style.display = "block";
+            }
+        }
+        
+        verResultadoBtn.onclick = () => {
+            let pontuacao = 0;
+            respostas.forEach((res, i) => {
+                if (res === perguntas[i].correta) {
+                    pontuacao++;
+                }
+            });
+            
+            if (pontuacao <= 3) {
+                resultadoDiv.innerText = "Seu conhecimento precisa melhorar! Continue estudando.";
+            } else if (pontuacao <= 7) {
+                resultadoDiv.innerText = "Bom trabalho! Mas ainda pode melhorar.";
+            } else {
+                resultadoDiv.innerText = "Parabéns! Você mandou muito bem!";
+            }
+        };
+        
+        carregarQuiz();
+    </script>
+</body>
+</html>
