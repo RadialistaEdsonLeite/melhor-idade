@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,115 +13,112 @@
         h1 {
             color: #333;
         }
-        #instructions {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-        #game-container {
+        #game-board {
             display: grid;
             grid-template-columns: repeat(4, 100px);
             grid-gap: 10px;
             justify-content: center;
-            margin: auto;
+            margin: 20px auto;
         }
         .card {
             width: 100px;
             height: 100px;
-            background-color: #ffffff;
+            background-color: #fff;
             border: 2px solid #ccc;
+            font-size: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
             cursor: pointer;
         }
         .hidden {
-            background-color: #ddd;
+            background-color: #999;
+            color: transparent;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <h1>Jogo da Memória</h1>
-    <p id="instructions">Escolha o tema e clique nos quadros abaixo para formar os pares.</p>
-    <button onclick="startGame()">Iniciar Jogo</button>
-    <div id="game-container"></div>
-    <p id="result"></p>
+    <p>Escolha o tema e clique nos quadros abaixo para formar os pares.</p>
+    <div id="game-board"></div>
+    <p id="message"></p>
+    <button onclick="startGame()">Jogar Novamente</button>
 
     <script>
+        const emojis = ["🍎", "🍌", "🍇", "🍉", "🍎", "🍌", "🍇", "🍉", "🐶", "🐱", "🐰", "🐵", "🐶", "🐱", "🐰", "🐵"];
         let cards = [];
-        let firstCard = null;
-        let secondCard = null;
-        let canClick = true;
-        let startTime;
+        let firstCard, secondCard;
+        let lockBoard = false;
+        let matches = 0;
+        let startTime, endTime;
 
-        function generateCards() {
-            const emojis = ['🍎', '🍊', '🍌', '🍇', '🍉', '🍓', '🥭', '🍍'];
-            let deck = [...emojis, ...emojis];
-            deck.sort(() => 0.5 - Math.random());
-            return deck;
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
         }
 
         function startGame() {
-            document.getElementById('result').innerText = '';
-            startTime = new Date().getTime();
-            const gameContainer = document.getElementById('game-container');
-            gameContainer.innerHTML = '';
-            cards = generateCards();
-            firstCard = null;
-            secondCard = null;
-            canClick = true;
-            
-            cards.forEach((emoji, index) => {
-                let card = document.createElement('div');
-                card.classList.add('card', 'hidden');
-                card.dataset.emoji = emoji;
-                card.dataset.index = index;
-                card.addEventListener('click', handleCardClick);
-                gameContainer.appendChild(card);
-            });
-        }
+            cards = shuffle([...emojis]);
+            document.getElementById("game-board").innerHTML = "";
+            matches = 0;
+            firstCard = secondCard = null;
+            lockBoard = false;
+            document.getElementById("message").innerText = "";
+            startTime = new Date();
 
-        function handleCardClick(event) {
-            if (!canClick) return;
-            let clickedCard = event.target;
-            
-            if (!clickedCard.classList.contains('hidden')) return;
-            clickedCard.innerText = clickedCard.dataset.emoji;
-            clickedCard.classList.remove('hidden');
-            
-            if (!firstCard) {
-                firstCard = clickedCard;
-            } else if (!secondCard) {
-                secondCard = clickedCard;
-                canClick = false;
-                
-                setTimeout(checkMatch, 500);
+            for (let i = 0; i < cards.length; i++) {
+                const card = document.createElement("div");
+                card.classList.add("card", "hidden");
+                card.dataset.index = i;
+                card.innerText = cards[i];
+                card.addEventListener("click", flipCard);
+                document.getElementById("game-board").appendChild(card);
             }
         }
 
-        function checkMatch() {
-            if (firstCard.dataset.emoji === secondCard.dataset.emoji) {
-                firstCard = null;
-                secondCard = null;
-                canClick = true;
-                if (document.querySelectorAll('.hidden').length === 0) {
-                    endGame();
+        function flipCard() {
+            if (lockBoard) return;
+            if (this === firstCard) return;
+
+            this.classList.remove("hidden");
+
+            if (!firstCard) {
+                firstCard = this;
+                return;
+            }
+
+            secondCard = this;
+            lockBoard = true;
+
+            if (firstCard.innerText === secondCard.innerText) {
+                matches++;
+                resetBoard();
+                if (matches === emojis.length / 2) {
+                    endTime = new Date();
+                    showResult();
                 }
             } else {
-                firstCard.classList.add('hidden');
-                secondCard.classList.add('hidden');
-                firstCard.innerText = '';
-                secondCard.innerText = '';
-                firstCard = null;
-                secondCard = null;
-                canClick = true;
+                setTimeout(() => {
+                    firstCard.classList.add("hidden");
+                    secondCard.classList.add("hidden");
+                    resetBoard();
+                }, 1000);
             }
         }
 
-        function endGame() {
-            let endTime = new Date().getTime();
+        function resetBoard() {
+            [firstCard, secondCard, lockBoard] = [null, null, false];
+        }
+
+        function showResult() {
             let timeTaken = Math.floor((endTime - startTime) / 1000);
             let message = "";
+
             if (timeTaken <= 60) {
                 message = "Parabéns! Você está com a memória afiada!";
             } else if (timeTaken <= 90) {
@@ -131,8 +128,11 @@
             } else {
                 message = "Continue treinando para bater seu recorde de tempo!";
             }
-            document.getElementById('result').innerText = `Você completou o jogo em ${timeTaken} segundos. ${message}`;
+
+            document.getElementById("message").innerText = `Tempo: ${timeTaken} segundos. ${message}`;
         }
+
+        startGame();
     </script>
 </body>
 </html>
