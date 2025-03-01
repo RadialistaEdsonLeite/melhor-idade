@@ -13,98 +13,112 @@
         h1 {
             font-size: 24px;
         }
-        #game-container {
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .game-board {
             display: grid;
             grid-template-columns: repeat(4, 100px);
-            grid-gap: 10px;
-            justify-content: center;
-            margin: 20px auto;
+            gap: 10px;
+            margin-top: 20px;
         }
         .card {
             width: 100px;
             height: 100px;
-            font-size: 24px;
             background-color: #fff;
-            border: 2px solid #ccc;
+            border: 2px solid #333;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 24px;
             cursor: pointer;
+            user-select: none;
         }
         .hidden {
-            background-color: #ccc;
-            color: transparent;
+            background-color: #bbb;
+        }
+        .buttons {
+            margin-top: 20px;
         }
         button {
             font-size: 18px;
-            padding: 10px 20px;
-            margin: 10px;
+            padding: 10px;
+            margin: 5px;
             cursor: pointer;
         }
     </style>
 </head>
 <body>
     <h1>Jogo da Memória - Melhor Idade</h1>
-    <p>Escolha um tema:</p>
-    <button onclick="startGame('frutas')">Frutas</button>
-    <button onclick="startGame('numeros')">Números</button>
-    <button onclick="startGame('letras')">Letras</button>
-    <button onclick="startGame('bichos')">Bichos</button>
-    <button onclick="startGame('emoji')">Emoji</button>
-    <div id="game-container"></div>
+    <div class="buttons">
+        <button onclick="startGame('frutas')">Frutas</button>
+        <button onclick="startGame('numeros')">Números</button>
+        <button onclick="startGame('letras')">Letras</button>
+        <button onclick="startGame('bichos')">Bichos</button>
+        <button onclick="startGame('emoji')">Emojis</button>
+    </div>
+    <div class="container">
+        <div id="game-board" class="game-board"></div>
+    </div>
     <script>
         const temas = {
-            frutas: ['🍎', '🍌', '🍊', '🍇', '🍓', '🥭', '🍍', '🍉'],
+            frutas: ['🍎', '🍌', '🍇', '🍉', '🍓', '🍍', '🥭', '🍒'],
             numeros: ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣'],
             letras: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
             bichos: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'],
-            emoji: ['😀', '😂', '😍', '😎', '😢', '😡', '🤩', '😇']
+            emoji: ['😀', '😂', '😍', '😎', '😜', '🤩', '🥳', '😇']
         };
-        
-        let cards = [];
+
         let selectedCards = [];
-        let matchedPairs = 0;
-        
+        let matchedCards = [];
+
         function startGame(theme) {
-            const gameContainer = document.getElementById('game-container');
-            gameContainer.innerHTML = '';
-            matchedPairs = 0;
-            const items = [...temas[theme], ...temas[theme]];
-            items.sort(() => Math.random() - 0.5);
-            
-            cards = items.map((item, index) => {
+            const board = document.getElementById('game-board');
+            board.innerHTML = '';
+            matchedCards = [];
+            selectedCards = [];
+
+            let symbols = [...temas[theme], ...temas[theme]];
+            symbols.sort(() => 0.5 - Math.random());
+
+            symbols.forEach((symbol, index) => {
                 const card = document.createElement('div');
                 card.classList.add('card', 'hidden');
-                card.dataset.value = item;
-                card.innerText = item;
+                card.dataset.index = index;
+                card.dataset.symbol = symbol;
                 card.addEventListener('click', () => flipCard(card));
-                gameContainer.appendChild(card);
-                return card;
+                board.appendChild(card);
             });
         }
-        
+
         function flipCard(card) {
-            if (selectedCards.length < 2 && !card.classList.contains('revealed')) {
+            if (selectedCards.length < 2 && !matchedCards.includes(card)) {
+                card.textContent = card.dataset.symbol;
                 card.classList.remove('hidden');
-                card.classList.add('revealed');
                 selectedCards.push(card);
+
                 if (selectedCards.length === 2) {
-                    setTimeout(checkMatch, 800);
+                    setTimeout(checkMatch, 500);
                 }
             }
         }
-        
+
         function checkMatch() {
-            if (selectedCards[0].dataset.value === selectedCards[1].dataset.value) {
-                matchedPairs++;
-                selectedCards = [];
-                if (matchedPairs === 8) {
-                    setTimeout(() => alert('Parabéns! Você concluiu o jogo!'), 500);
+            const [card1, card2] = selectedCards;
+            if (card1.dataset.symbol === card2.dataset.symbol) {
+                matchedCards.push(card1, card2);
+                if (matchedCards.length === 16) {
+                    setTimeout(() => alert('Parabéns! Você completou o jogo!'), 200);
                 }
             } else {
-                selectedCards.forEach(card => card.classList.add('hidden'));
-                selectedCards = [];
+                card1.textContent = '';
+                card2.textContent = '';
+                card1.classList.add('hidden');
+                card2.classList.add('hidden');
             }
+            selectedCards = [];
         }
     </script>
 </body>
