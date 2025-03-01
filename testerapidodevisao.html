@@ -39,19 +39,19 @@ const QuizVisao = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-900 text-white rounded-lg shadow-md w-full max-w-3xl mx-auto">
-      <h2 className="text-xl font-bold mb-4 text-center">Teste Rápido de Visão</h2>
+    <div className="p-4 max-w-xl mx-auto">
+      <h2 className="text-xl font-bold mb-4">Teste Rápido de Visão</h2>
       
       {!finalizado ? (
         <div>
           {perguntas.map((q, index) => (
             <div key={index} className="mb-4">
-              <p className="font-semibold mb-2">{q.pergunta}</p>
-              <div className="grid grid-cols-2 gap-2">
+              <p className="font-semibold">{q.pergunta}</p>
+              <div className="flex flex-wrap gap-2 mt-2">
                 {q.opcoes.map((op, i) => (
                   <Button
                     key={i}
-                    className={`w-full py-2 text-lg ${respostas[index] === op ? "bg-orange-500" : "bg-gray-700"}`}
+                    variant={respostas[index] === op ? "default" : "outline"}
                     onClick={() => handleResposta(index, op)}
                   >
                     {op}
@@ -60,17 +60,16 @@ const QuizVisao = () => {
               </div>
             </div>
           ))}
-          <Button className="w-full mt-4 bg-green-500 text-white py-2 text-lg" onClick={() => setFinalizado(true)}>
+
+          <Button className="mt-4" onClick={() => setFinalizado(true)}>
             Ver Resultado
           </Button>
         </div>
       ) : (
-        <div className="text-center">
-          <h3 className="text-lg font-semibold mb-3">Resultado do Teste</h3>
+        <div>
+          <h3 className="text-lg font-bold mb-2">Resultado do Teste</h3>
           <p className="mb-4">{calcularResultado()}</p>
-          <Button className="w-full bg-blue-500 text-white py-2 text-lg" onClick={() => window.close()}>
-            Voltar ao eBook
-          </Button>
+          <Button onClick={() => window.close()}>Voltar ao eBook</Button>
         </div>
       )}
     </div>
