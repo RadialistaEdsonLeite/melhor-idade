@@ -13,126 +13,136 @@
         h1 {
             color: #333;
         }
-        #game-board {
+        .menu {
+            margin-bottom: 20px;
+        }
+        .grid {
             display: grid;
             grid-template-columns: repeat(4, 100px);
             grid-gap: 10px;
             justify-content: center;
-            margin: 20px auto;
         }
         .card {
             width: 100px;
             height: 100px;
-            background-color: #fff;
-            border: 2px solid #ccc;
-            font-size: 24px;
+            background-color: #ddd;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 2em;
             cursor: pointer;
         }
         .hidden {
-            background-color: #999;
+            background-color: #bbb;
             color: transparent;
-        }
-        button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 18px;
-            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <h1>Jogo da Memória</h1>
-    <p>Escolha o tema e clique nos quadros abaixo para formar os pares.</p>
-    <div id="game-board"></div>
-    <p id="message"></p>
-    <button onclick="startGame()">Jogar Novamente</button>
-
+    <p>Escolha um tema e teste sua memória!</p>
+    <div class="menu">
+        <button onclick="iniciarJogo('frutas')">Frutas</button>
+        <button onclick="iniciarJogo('bichos')">Bichos</button>
+        <button onclick="iniciarJogo('numeros')">Números</button>
+        <button onclick="iniciarJogo('letras')">Letras</button>
+        <button onclick="iniciarJogo('emojis')">Emojis</button>
+    </div>
+    <div class="grid" id="gameBoard"></div>
+    <p id="mensagem"></p>
+    <button onclick="reiniciarJogo()" style="display:none;">Jogar Novamente</button>
+    
     <script>
-        const emojis = ["🍎", "🍌", "🍇", "🍉", "🍎", "🍌", "🍇", "🍉", "🐶", "🐱", "🐰", "🐵", "🐶", "🐱", "🐰", "🐵"];
-        let cards = [];
-        let firstCard, secondCard;
-        let lockBoard = false;
-        let matches = 0;
-        let startTime, endTime;
+        const temas = {
+            frutas: ['🍎', '🍌', '🍇', '🍉', '🍍', '🍒', '🥭', '🥝'],
+            bichos: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'],
+            numeros: ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣'],
+            letras: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
+            emojis: ['😀', '😂', '😍', '😎', '😡', '😭', '🤔', '🥳']
+        };
+        let cartas = [];
+        let primeiraCarta = null;
+        let segundaCarta = null;
+        let bloqueio = false;
+        let inicioTempo;
+        let paresEncontrados = 0;
 
-        function shuffle(array) {
-            return array.sort(() => Math.random() - 0.5);
+        function iniciarJogo(tema) {
+            const emojisSelecionados = temas[tema];
+            cartas = [...emojisSelecionados, ...emojisSelecionados]
+                .sort(() => Math.random() - 0.5)
+                .map(emoji => ({ emoji, revelada: false }));
+
+            primeiraCarta = null;
+            segundaCarta = null;
+            bloqueio = false;
+            paresEncontrados = 0;
+            inicioTempo = Date.now();
+            document.getElementById("mensagem").textContent = "";
+            document.querySelector("button[onclick='reiniciarJogo()']").style.display = "none";
+            renderizarJogo();
         }
 
-        function startGame() {
-            cards = shuffle([...emojis]);
-            document.getElementById("game-board").innerHTML = "";
-            matches = 0;
-            firstCard = secondCard = null;
-            lockBoard = false;
-            document.getElementById("message").innerText = "";
-            startTime = new Date();
-
-            for (let i = 0; i < cards.length; i++) {
-                const card = document.createElement("div");
-                card.classList.add("card", "hidden");
-                card.dataset.index = i;
-                card.innerText = cards[i];
-                card.addEventListener("click", flipCard);
-                document.getElementById("game-board").appendChild(card);
-            }
+        function renderizarJogo() {
+            const gameBoard = document.getElementById("gameBoard");
+            gameBoard.innerHTML = "";
+            cartas.forEach((carta, index) => {
+                const cardDiv = document.createElement("div");
+                cardDiv.className = "card" + (carta.revelada ? "" : " hidden");
+                cardDiv.textContent = carta.revelada ? carta.emoji : "?";
+                cardDiv.onclick = () => virarCarta(index);
+                gameBoard.appendChild(cardDiv);
+            });
         }
 
-        function flipCard() {
-            if (lockBoard) return;
-            if (this === firstCard) return;
+        function virarCarta(index) {
+            if (bloqueio || cartas[index].revelada) return;
 
-            this.classList.remove("hidden");
-
-            if (!firstCard) {
-                firstCard = this;
-                return;
+            cartas[index].revelada = true;
+            if (!primeiraCarta) {
+                primeiraCarta = index;
+            } else {
+                segundaCarta = index;
+                bloqueio = true;
+                setTimeout(verificarPar, 1000);
             }
+            renderizarJogo();
+        }
 
-            secondCard = this;
-            lockBoard = true;
-
-            if (firstCard.innerText === secondCard.innerText) {
-                matches++;
-                resetBoard();
-                if (matches === emojis.length / 2) {
-                    endTime = new Date();
-                    showResult();
+        function verificarPar() {
+            if (cartas[primeiraCarta].emoji === cartas[segundaCarta].emoji) {
+                paresEncontrados++;
+                if (paresEncontrados === cartas.length / 2) {
+                    fimDeJogo();
                 }
             } else {
-                setTimeout(() => {
-                    firstCard.classList.add("hidden");
-                    secondCard.classList.add("hidden");
-                    resetBoard();
-                }, 1000);
+                cartas[primeiraCarta].revelada = false;
+                cartas[segundaCarta].revelada = false;
             }
+            primeiraCarta = null;
+            segundaCarta = null;
+            bloqueio = false;
+            renderizarJogo();
         }
 
-        function resetBoard() {
-            [firstCard, secondCard, lockBoard] = [null, null, false];
+        function fimDeJogo() {
+            let tempoDecorrido = (Date.now() - inicioTempo) / 1000;
+            let mensagem = "";
+            if (tempoDecorrido <= 60) mensagem = "Parabéns! Você está com a memória afiada!";
+            else if (tempoDecorrido <= 90) mensagem = "Você mandou muito bem. Parabéns!";
+            else if (tempoDecorrido <= 120) mensagem = "Tá indo bem, mas dá pra melhorar ainda mais no tempo.";
+            else mensagem = "Continue treinando para bater seu recorde de tempo!";
+            
+            document.getElementById("mensagem").textContent = mensagem;
+            document.querySelector("button[onclick='reiniciarJogo()']").style.display = "inline";
         }
 
-        function showResult() {
-            let timeTaken = Math.floor((endTime - startTime) / 1000);
-            let message = "";
-
-            if (timeTaken <= 60) {
-                message = "Parabéns! Você está com a memória afiada!";
-            } else if (timeTaken <= 90) {
-                message = "Você mandou muito bem. Parabéns!";
-            } else if (timeTaken <= 120) {
-                message = "Tá indo bem, mas dá pra melhorar ainda mais no tempo.";
-            } else {
-                message = "Continue treinando para bater seu recorde de tempo!";
-            }
-
-            document.getElementById("message").innerText = `Tempo: ${timeTaken} segundos. ${message}`;
+        function reiniciarJogo() {
+            document.querySelector(".menu").style.display = "block";
+            document.getElementById("gameBoard").innerHTML = "";
+            document.getElementById("mensagem").textContent = "";
+            document.querySelector("button[onclick='reiniciarJogo()']").style.display = "none";
         }
-
-        startGame();
     </script>
 </body>
 </html>
