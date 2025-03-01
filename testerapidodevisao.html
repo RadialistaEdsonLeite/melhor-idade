@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,30 +8,45 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f4f4f4;
-            padding: 20px;
+            background-color: #121212;
+            color: white;
+            margin: 0;
+            padding: 0;
         }
         .container {
-            background: white;
-            padding: 20px;
+            width: 98%;
             max-width: 600px;
-            margin: auto;
+            margin: 20px auto;
+            background: #222;
+            padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+        h2 {
+            font-size: 24px;
         }
         .question {
-            font-size: 18px;
+            font-size: 20px;
+            font-weight: bold;
             margin-bottom: 10px;
         }
         .options button {
             display: block;
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 5px 0;
-            font-size: 16px;
+            font-size: 18px;
+            background-color: #ff5c11;
+            color: white;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
+            transition: 0.3s;
         }
-        #result {
+        .options button:hover {
+            background-color: #e04e0a;
+        }
+        .result {
             font-size: 20px;
             font-weight: bold;
             margin-top: 20px;
@@ -41,37 +56,33 @@
 <body>
     <div class="container">
         <h2>Teste Rápido de Visão</h2>
-        <p>Responda as perguntas abaixo e veja sua avaliação ao final!</p>
         <div id="quiz"></div>
-        <div id="result"></div>
+        <div id="result" class="result"></div>
     </div>
-
     <script>
         const questions = [
-            { question: "Você consegue ler placas de trânsito a distância?", options: ["Sempre", "Às vezes", "Com dificuldade", "Não"], answer: 0 },
-            { question: "Você tem dificuldade em enxergar letras pequenas?", options: ["Nunca", "Raramente", "Frequentemente", "Sempre"], answer: 3 },
-            { question: "As cores parecem menos vibrantes para você?", options: ["Não", "Pouco", "Sim, algumas", "Sim, muitas"], answer: 0 },
-            { question: "Você sente necessidade de apertar os olhos para enxergar melhor?", options: ["Nunca", "Raramente", "Frequentemente", "Sempre"], answer: 3 },
-            { question: "Você vê sombras ou manchas em sua visão?", options: ["Nunca", "Ocasionalmente", "Frequentemente", "Sempre"], answer: 0 },
-            { question: "Você tem dificuldades para ler em ambientes com pouca luz?", options: ["Não", "Raramente", "Sim, um pouco", "Sim, muito"], answer: 0 },
-            { question: "Você tem dor de cabeça após longos períodos lendo?", options: ["Nunca", "Raramente", "Frequentemente", "Sempre"], answer: 0 },
-            { question: "Você vê halos ou brilho ao redor das luzes?", options: ["Nunca", "Raramente", "Frequentemente", "Sempre"], answer: 0 },
-            { question: "Você tem dificuldade para focar ao mudar o olhar de perto para longe?", options: ["Nunca", "Raramente", "Frequentemente", "Sempre"], answer: 0 },
-            { question: "Você sente que sua visão está piorando com o tempo?", options: ["Não", "Muito pouco", "Sim, um pouco", "Sim, muito"], answer: 0 }
+            { question: "O que você vê com mais clareza ao longe?", options: ["Objetos grandes", "Objetos pequenos", "Tudo", "Nada"], answer: 2 },
+            { question: "Você sente dificuldades para ler textos pequenos?", options: ["Sim, bastante", "Às vezes", "Não", "Depende da iluminação"], answer: 1 },
+            { question: "As luzes muito fortes te incomodam?", options: ["Sim", "Não", "Apenas à noite", "Raramente"], answer: 0 },
+            { question: "Você enxerga bem as cores?", options: ["Sim, todas", "Algumas cores ficam escuras", "Algumas cores ficam claras", "Não sei dizer"], answer: 0 },
+            { question: "Você vê manchas ou sombras na visão?", options: ["Sim, constantemente", "Às vezes", "Não", "Somente ao acordar"], answer: 1 },
+            { question: "Você tem dificuldades em ambientes pouco iluminados?", options: ["Sim, muito", "Sim, um pouco", "Não", "Somente ao mudar de um ambiente claro para escuro"], answer: 1 },
+            { question: "As letras se embaralham quando você lê?", options: ["Sim, sempre", "Às vezes", "Muito raramente", "Nunca"], answer: 1 },
+            { question: "Você precisa aproximar muito um texto para enxergar?", options: ["Sim", "Não", "Depende do tamanho da fonte", "Apenas quando estou cansado"], answer: 2 },
+            { question: "Você vê halos ou brilho ao redor das luzes?", options: ["Sim, constantemente", "Apenas à noite", "Nunca", "Às vezes"], answer: 3 },
+            { question: "Sente os olhos cansados ou ardendo frequentemente?", options: ["Sim, muito", "Às vezes", "Nunca", "Apenas quando passo muito tempo no celular"], answer: 3 }
         ];
 
-        let score = 0;
         let currentQuestion = 0;
-        const quizContainer = document.getElementById("quiz");
-        const resultContainer = document.getElementById("result");
+        let score = 0;
 
         function loadQuestion() {
             if (currentQuestion < questions.length) {
-                let q = questions[currentQuestion];
-                quizContainer.innerHTML = `
+                const q = questions[currentQuestion];
+                document.getElementById("quiz").innerHTML = `
                     <div class="question">${q.question}</div>
                     <div class="options">
-                        ${q.options.map((option, index) => `<button onclick="selectAnswer(${index})">${option}</button>`).join('')}
+                        ${q.options.map((opt, index) => `<button onclick="selectAnswer(${index})">${opt}</button>`).join('')}
                     </div>
                 `;
             } else {
@@ -90,14 +101,14 @@
         function showResult() {
             let message = "";
             if (score >= 8) {
-                message = "Sua visão está excelente! Continue cuidando bem dela.";
+                message = "Sua visão parece estar excelente! Mesmo assim, consulte um oftalmologista regularmente.";
             } else if (score >= 5) {
-                message = "Sua visão está boa, mas talvez precise de atenção.";
+                message = "Sua visão apresenta alguns sinais de dificuldades. Recomendamos um exame oftalmológico.";
             } else {
-                message = "Atenção! Seria bom consultar um oftalmologista.";
+                message = "Sua visão pode estar comprometida. Procure um especialista o quanto antes!";
             }
-            quizContainer.innerHTML = "";
-            resultContainer.innerHTML = `<p>${message}</p>`;
+            document.getElementById("quiz").innerHTML = "";
+            document.getElementById("result").innerText = message;
         }
 
         loadQuestion();
