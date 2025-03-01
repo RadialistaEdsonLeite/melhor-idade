@@ -3,16 +3,46 @@ import { Button } from "@/components/ui/button";
 
 const QuizVisao = () => {
   const perguntas = [
-    { pergunta: "Você sente dificuldade para ler letras pequenas?", opcoes: ["Nunca", "Às vezes", "Frequentemente", "Sempre"] },
-    { pergunta: "Você enxerga bem de longe sem óculos?", opcoes: ["Sim, perfeitamente", "Com leve dificuldade", "Com bastante dificuldade", "Não consigo ver nada"] },
-    { pergunta: "Você sente os olhos cansados ao final do dia?", opcoes: ["Nunca", "Às vezes", "Frequentemente", "Sempre"] },
-    { pergunta: "Luzes muito brilhantes te incomodam?", opcoes: ["Não", "Levemente", "Sim, bastante", "Muito mesmo"] },
-    { pergunta: "Você vê halos ao redor das luzes à noite?", opcoes: ["Nunca", "Às vezes", "Frequentemente", "Sempre"] },
-    { pergunta: "Sente visão embaçada ao mudar o foco de perto para longe?", opcoes: ["Nunca", "Às vezes", "Frequentemente", "Sempre"] },
-    { pergunta: "Precisa aumentar o brilho da tela para enxergar melhor?", opcoes: ["Não", "Sim, um pouco", "Sim, bastante", "Sempre"] },
-    { pergunta: "Enxerga cores de forma vívida e nítida?", opcoes: ["Sim, perfeitamente", "Com leve dificuldade", "Com bastante dificuldade", "Não vejo bem as cores"] },
-    { pergunta: "Tem dificuldade para dirigir à noite?", opcoes: ["Nenhuma", "Pouca", "Moderada", "Muita"] },
-    { pergunta: "Você pisca ou esfrega os olhos com frequência para tentar ver melhor?", opcoes: ["Nunca", "Às vezes", "Frequentemente", "Sempre"] }
+    {
+      pergunta: "Você sente dificuldade para ler letras pequenas?",
+      opcoes: ["Nunca", "Às vezes", "Frequentemente", "Sempre"],
+    },
+    {
+      pergunta: "Você enxerga bem de longe sem óculos?",
+      opcoes: ["Sim, perfeitamente", "Com leve dificuldade", "Com bastante dificuldade", "Não consigo ver nada"],
+    },
+    {
+      pergunta: "Você sente os olhos cansados ao final do dia?",
+      opcoes: ["Nunca", "Às vezes", "Frequentemente", "Sempre"],
+    },
+    {
+      pergunta: "Luzes muito brilhantes te incomodam?",
+      opcoes: ["Não", "Levemente", "Sim, bastante", "Muito mesmo"],
+    },
+    {
+      pergunta: "Você vê halos ao redor das luzes à noite?",
+      opcoes: ["Nunca", "Às vezes", "Frequentemente", "Sempre"],
+    },
+    {
+      pergunta: "Sente visão embaçada ao mudar o foco de perto para longe?",
+      opcoes: ["Nunca", "Às vezes", "Frequentemente", "Sempre"],
+    },
+    {
+      pergunta: "Precisa aumentar o brilho da tela para enxergar melhor?",
+      opcoes: ["Não", "Sim, um pouco", "Sim, bastante", "Sempre"],
+    },
+    {
+      pergunta: "Enxerga cores de forma vívida e nítida?",
+      opcoes: ["Sim, perfeitamente", "Com leve dificuldade", "Com bastante dificuldade", "Não vejo bem as cores"],
+    },
+    {
+      pergunta: "Tem dificuldade para dirigir à noite?",
+      opcoes: ["Nenhuma", "Pouca", "Moderada", "Muita"],
+    },
+    {
+      pergunta: "Você pisca ou esfrega os olhos com frequência para tentar ver melhor?",
+      opcoes: ["Nunca", "Às vezes", "Frequentemente", "Sempre"],
+    },
   ];
 
   const [respostas, setRespostas] = useState(Array(perguntas.length).fill(null));
@@ -39,19 +69,18 @@ const QuizVisao = () => {
   };
 
   return (
-    <div className="p-4 max-w-xl mx-auto">
-      <h2 className="text-xl font-bold mb-4">Teste Rápido de Visão</h2>
-      
+    <div className="bg-[#222] text-white p-5 min-h-screen flex flex-col items-center">
+      <h1 className="text-3xl font-bold mb-4">Teste Rápido de Visão</h1>
       {!finalizado ? (
-        <div>
+        <div className="w-11/12 max-w-2xl">
           {perguntas.map((q, index) => (
             <div key={index} className="mb-4">
-              <p className="font-semibold">{q.pergunta}</p>
-              <div className="flex flex-wrap gap-2 mt-2">
+              <p className="font-bold text-lg mb-2">{q.pergunta}</p>
+              <div className="grid grid-cols-2 gap-2">
                 {q.opcoes.map((op, i) => (
                   <Button
                     key={i}
-                    variant={respostas[index] === op ? "default" : "outline"}
+                    className={`w-full p-3 text-lg ${respostas[index] === op ? "bg-orange-500" : "bg-gray-700"}`}
                     onClick={() => handleResposta(index, op)}
                   >
                     {op}
@@ -60,16 +89,13 @@ const QuizVisao = () => {
               </div>
             </div>
           ))}
-
-          <Button className="mt-4" onClick={() => setFinalizado(true)}>
-            Ver Resultado
-          </Button>
+          <Button className="mt-4 bg-orange-500 text-lg p-3" onClick={() => setFinalizado(true)}>Ver Resultado</Button>
         </div>
       ) : (
-        <div>
-          <h3 className="text-lg font-bold mb-2">Resultado do Teste</h3>
-          <p className="mb-4">{calcularResultado()}</p>
-          <Button onClick={() => window.close()}>Voltar ao eBook</Button>
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Resultado do Teste</h2>
+          <p className="text-lg mb-4">{calcularResultado()}</p>
+          <Button className="bg-orange-500 text-lg p-3" onClick={() => window.close()}>Voltar ao eBook</Button>
         </div>
       )}
     </div>
