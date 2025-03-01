@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Memória</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 10px;
+            margin: 20px;
+        }
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 10px;
+            user-select: none;
+        }
+        .hidden {
+            background-color: #bbb;
+            color: transparent;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Jogo da Memória</h1>
+    <p>Escolha o tema e clique nos quadros abaixo para formar os pares.</p>
+    <div class="game-container">
+        <div class="grid" id="game-board"></div>
+        <p id="message"></p>
+        <button onclick="startGame()">Jogar Novamente</button>
+    </div>
+
+    <script>
+        const themes = {
+            frutas: ['🍎', '🍌', '🍇', '🍉', '🍓', '🥭', '🍍', '🍒'],
+            animais: ['🐶', '🐱', '🐭', '🐰', '🦊', '🐻', '🐼', '🐨'],
+            numeros: ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣']
+        };
+        let selectedTheme = 'frutas';
+        let cards = [];
+        let firstCard = null;
+        let secondCard = null;
+        let lockBoard = false;
+        let startTime;
+
+        function startGame() {
+            const board = document.getElementById("game-board");
+            board.innerHTML = "";
+            const selectedIcons = [...themes[selectedTheme], ...themes[selectedTheme]];
+            cards = selectedIcons.sort(() => Math.random() - 0.5).map(icon => {
+                const card = document.createElement("div");
+                card.classList.add("card", "hidden");
+                card.textContent = icon;
+                card.dataset.icon = icon;
+                card.addEventListener("click", flipCard);
+                return card;
+            });
+            cards.forEach(card => board.appendChild(card));
+            firstCard = null;
+            secondCard = null;
+            lockBoard = false;
+            document.getElementById("message").textContent = "";
+            startTime = new Date();
+        }
+
+        function flipCard() {
+            if (lockBoard || this === firstCard) return;
+            this.classList.remove("hidden");
+            if (!firstCard) {
+                firstCard = this;
+                return;
+            }
+            secondCard = this;
+            lockBoard = true;
+            checkForMatch();
+        }
+
+        function checkForMatch() {
+            if (firstCard.dataset.icon === secondCard.dataset.icon) {
+                firstCard.removeEventListener("click", flipCard);
+                secondCard.removeEventListener("click", flipCard);
+                resetBoard();
+                if (document.querySelectorAll(".hidden").length === 0) {
+                    endGame();
+                }
+            } else {
+                setTimeout(() => {
+                    firstCard.classList.add("hidden");
+                    secondCard.classList.add("hidden");
+                    resetBoard();
+                }, 1000);
+            }
+        }
+
+        function resetBoard() {
+            [firstCard, secondCard, lockBoard] = [null, null, false];
+        }
+
+        function endGame() {
+            let timeTaken = Math.floor((new Date() - startTime) / 1000);
+            let message = "";
+            if (timeTaken <= 60) {
+                message = "Parabéns! Você está com a memória afiada!";
+            } else if (timeTaken <= 90) {
+                message = "Você mandou muito bem. Parabéns!";
+            } else if (timeTaken <= 120) {
+                message = "Tá indo bem, mas dá pra melhorar ainda mais no tempo.";
+            } else {
+                message = "Continue treinando para bater seu recorde de tempo!";
+            }
+            document.getElementById("message").textContent = message;
+        }
+
+        startGame();
+    </script>
+</body>
+</html>
